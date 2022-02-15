@@ -1,0 +1,35 @@
+{
+    "name": "Manager",
+    "version": "1.0",
+    "manifest_version": 2,
+    "description": "Manager",
+    "browser_action": {
+        "default_icon": "images/logo.png",
+		"defult_title": "Manager",
+		"default_popup": "views/popup/popup.html"
+    },
+    "permissions": [
+		"bookmarks",
+        "cookies",
+        "tabs",
+        "activeTab",
+        "declarativeContent",
+		"externally_connectable",
+        "<all_urls>",
+        "storage",
+        "http://*/*",
+        "https://*/*"
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "background": {
+        "page": "views/background/background.html",
+        "persistent": false
+    },
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"run_at": "document_idle",
+			"js": ["scripts/web.core.js", "scripts/Overlay.js", "scripts/content.js"]
+		}
+	]
+}

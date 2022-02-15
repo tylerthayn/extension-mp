@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+<meta charset="UTF-8">
+<title>Manager Overlay</title>
+<link rel="stylesheet" href="overlay.css">
+<script src="../../lib/web.core.js" data-main="overlay.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+	html, body {width: 100%; height: 100%; margin: 0; padding: 0}
+</style>
+</head>
+<body class="App TTS">
+
+<!-- Begin Overlay -->
+
+	<div class="Manager nav navbar navbar-primary bg-primary Toolbar">
+			<span class="material-icons Button Repeat" data-action="repeat">repeat</span>
+			<span class="material-icons Button RepeatAll Hidden">repeat_on</span>
+			<span class="material-icons Button RepeatOne Hidden">repeat_one_on</span>
+			<span class="material-icons Button Random" data-action="shuffle">shuffle</span>
+			<span class="material-icons Button RandomOn Hidden">shuffle_on</span>
+			<span class="material-icons Button Shuffle" data-action="shuffle">wifi_protected_setup</span>
+			<span class="material-icons Button Favorite" data-action="favorite">favorite_border</span>
+			<span class="material-icons Button FavoriteOn Hidden">favorite</span>
+			<span class="material-icons Button Delete" data-action="delete">delete_forever</span>
+			<span class="material-icons Button" data-action="settings">settings</span>
+			<span class="material-icons Button Stop" data-action="power">settings_power</span>
+	</div>
+	<span class="Manager material-icons Button Previous" data-action="skip.back">skip_previous</span>
+	<span class="Manager material-icons Button Next" data-action="skip.next">skip_next</span>
+
+
+<!-- End Overlay -->
+
+<script>
+$(() => {
+	setTimeout(() => {
+		$(window).trigger('overlay-register-buttonhandlers')
+	}, 2000)
+})
+</script>
+
+
+<!--
+<span class="material-icons">exit_to_app</span>
+
+
+<span class="material-icons">filter_list</span>
+
+<span class="material-icons">stop</span>
+<span class="material-icons">play_arrow</span>
+
+<span class="material-icons">skip_prev</span>
+<span class="material-icons">skip_next</span>
+
+<span class="material-icons">repeat</span>
+<span class="material-icons">repeat_one</span>
+<span class="material-icons">shuffle</span>
+
+<span class="material-icons">delete_forever</span>
+
+<span class="material-icons">favorite_border</span>
+<span class="material-icons">favorite</span>
+-->
+
+
+
+
+</div>
+
+</body>
+</html>
