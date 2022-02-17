@@ -16,16 +16,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, cb) {
 
 function BookmarksTree (tree, ids, init = false) {
 	let list = $('<ul>')
-	if (!init) {
-		list.addClass('nested')
+	if (init) {
+		list.addClass('TreeView')
 	}
 	tree.children.forEach(child => {
-		let item = $(`<li><span>${child.title}</span><input type="checkbox" id="${child.id}"></li>`)
+		let item = $(`<li><span id="${child.id}">${child.title}</span></li>`)
 		if (ids.includes(child.id)) {
-			item.find('input').attr('checked', true)
+			item.find('span').addClass('Selected')
 		}
 		if (child.children) {
-			item.addClass('caret')
 			item.append(BookmarksTree(child, ids))
 		}
 		list.append(item)

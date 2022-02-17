@@ -1,26 +1,26 @@
+chrome.runtime.onMessageExternal.addListener(Start)
+chrome.runtime.onMessage.addListener(Start)
 
-chrome.runtime.onMessage.addListener(function (request, sender, cb) {
+function Start (request, sender, cb) {
 	if (request.cmd == 'start') {
 		logj(request)
-		try {
-			chrome.tabs.query({active:true}, function (tabs) {
-				GetBookmarkIds(request.ids, ids => {
-					window.playlist.Clear()
-					ids.forEach(id => {
-						window.playlist.push(id)
-					})
-					window.playlist.Save()
-					window.tab = tabs[0].id
-					window.playlist.Start()
-					playlist.Next(url => {
-						chrome.tabs.sendMessage(tabs[0].id, {cmd: 'loadurl', url: url})
-					})
+		chrome.tabs.query({active:true}, function (tabs) {
+			GetBookmarkIds(request.ids, ids => {
+				window.playlist.Clear()
+				ids.forEach(id => {
+					window.playlist.push(id)
+				})
+				window.playlist.Save()
+				window.tab = tabs[0].id
+				window.playlist.Start()
+				playlist.Next(url => {
+					chrome.tabs.sendMessage(tabs[0].id, {cmd: 'loadurl', url: url})
 				})
 			})
-		} catch (e) {log(e)}
+		})
 		return true
 	}
-})
+}
 
 
 function GetBookmarkUrl (id, cb) {

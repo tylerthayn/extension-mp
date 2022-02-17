@@ -162,16 +162,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, cb) {
 
 function BookmarksTree (tree, ids, init = false) {
 	let list = $('<ul>')
-	if (!init) {
-		list.addClass('nested')
+	if (init) {
+		list.addClass('TreeView')
 	}
 	tree.children.forEach(child => {
-		let item = $(`<li><span>${child.title}</span><input type="checkbox" id="${child.id}"></li>`)
+		let item = $(`<li><span id="${child.id}">${child.title}</span></li>`)
 		if (ids.includes(child.id)) {
-			item.find('input').attr('checked', true)
+			item.find('span').addClass('Selected')
 		}
 		if (child.children) {
-			item.addClass('caret')
 			item.append(BookmarksTree(child, ids))
 		}
 		list.append(item)
@@ -364,29 +363,29 @@ chrome.runtime.onMessage.addListener(function (request, sender, cb) {
 
 
 
+chrome.runtime.onMessageExternal.addListener(Start)
+chrome.runtime.onMessage.addListener(Start)
 
-chrome.runtime.onMessage.addListener(function (request, sender, cb) {
+function Start (request, sender, cb) {
 	if (request.cmd == 'start') {
 		logj(request)
-		try {
-			chrome.tabs.query({active:true}, function (tabs) {
-				GetBookmarkIds(request.ids, ids => {
-					window.playlist.Clear()
-					ids.forEach(id => {
-						window.playlist.push(id)
-					})
-					window.playlist.Save()
-					window.tab = tabs[0].id
-					window.playlist.Start()
-					playlist.Next(url => {
-						chrome.tabs.sendMessage(tabs[0].id, {cmd: 'loadurl', url: url})
-					})
+		chrome.tabs.query({active:true}, function (tabs) {
+			GetBookmarkIds(request.ids, ids => {
+				window.playlist.Clear()
+				ids.forEach(id => {
+					window.playlist.push(id)
+				})
+				window.playlist.Save()
+				window.tab = tabs[0].id
+				window.playlist.Start()
+				playlist.Next(url => {
+					chrome.tabs.sendMessage(tabs[0].id, {cmd: 'loadurl', url: url})
 				})
 			})
-		} catch (e) {log(e)}
+		})
 		return true
 	}
-})
+}
 
 
 function GetBookmarkUrl (id, cb) {
@@ -432,269 +431,6 @@ function GetBookmarkIds (ids, callback) {
 
 
 chrome.runtime.onMessage.addListener(function (request, sender, cb) {
-	if (request.cmd == 'stop') {
-		logj(request)
-		try {
-			chrome.storage.sync.set({running: false})
-		} catch (e) {}
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'delete') {
-		logj(request)
-		try {
-			chrome.tabs.query({active:true,currentWindow:true}, function (tabs) {
-				chrome.bookmarks.search({url: tabs[0].url}, results => {
-					chrome.bookmarks.remove(results[0].id)
-				})
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'favorite.add') {
-		logj(request)
-		try {
-			chrome.bookmarks.remove(request.id)
-		} catch (e) {}
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'favorite.remove') {
-		logj(request)
-		try {
-			chrome.bookmarks.remove(request.id)
-		} catch (e) {}
-	}
-})
-
-
-
-
-//MSG: {cmd: 'get.bookmarks'} //
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'get.bookmarks') {
-		logj(request)
-		try {
-			chrome.storage.sync.get('playlist', function (storage) {
-				chrome.bookmarks.getTree(tree => {
-					cb(BookmarksTree(tree[0], storage.playlist || [], true)[0].outerHTML)
-				})
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-function BookmarksTree (tree, ids, init = false) {
-	let list = $('<ul>')
-	if (!init) {
-		list.addClass('nested')
-	}
-	tree.children.forEach(child => {
-		let item = $(`<li><span>${child.title}</span><input type="checkbox" id="${child.id}"></li>`)
-		if (ids.includes(child.id)) {
-			item.find('input').attr('checked', true)
-		}
-		if (child.children) {
-			item.addClass('caret')
-			item.append(BookmarksTree(child, ids))
-		}
-		list.append(item)
-	})
-	return list
-}
-
-
-
-//MSG: {cmd: 'get.file', file: 'file'} //
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'get.file') {
-		logj(request)
-		try {
-			$.get(chrome.extension.getURL(request.file), (data, status, jqXHR) => {
-				cb(data)
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-//MSG: {cmd: 'get.file', file: 'file'} //
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'get.random') {
-		logj(request)
-		try {
-			chrome.storage.sync.get('random', function (storage) {
-				cb(storage.random || false)
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'get.repeat') {
-		logj(request)
-		try {
-			chrome.storage.sync.get('repeat', function (storage) {
-				cb(storage.repeat || false)
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'get.running') {
-		logj(request)
-		try {
-			chrome.tabs.query({active:true,currentWindow:true}, function (tabs) {
-				if (tabs[0].id == window.tab) {
-					chrome.storage.sync.get('running', function (storage) {
-						cb(storage.running || false)
-					})
-				} else {
-					cb(false)
-				}
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'next') {
-		logj(request)
-
-			chrome.storage.sync.get(null, function (storage) {
-logj(storage)
-				let current = storage.current || 0
-				if (storage.repeat === 1) {
-					cb(storage.playlist[current])
-				} else if (current >= storage.playlist.length && storage.repeat === true) {
-					currrent = storage.random ? Math.round(Math.random() * storage.playlist.length) : current + 1
-					chrome.storage.sync.set({current: current})
-					cb(storage.playlist[current])
-				} else {
-					cb(null)
-				}
-			})
-
-		return true
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'save.playlist') {
-		logj(request)
-		try {
-				chrome.storage.sync.set({playlist: request.ids}, function() {
-					console.log('Playlist saved ' + request.ids)
-				})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'set.random') {
-		logj(request)
-		try {
-				chrome.storage.sync.set({random: request.random || false})
-		} catch (e) {}
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'set.repeat') {
-		logj(request)
-		try {
-				chrome.storage.sync.set({repeat: request.repeat || false})
-		} catch (e) {}
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'shuffle') {
-		logj(request)
-		try {
-			chrome.storage.sync.get(playlist, function (storage) {
-				storage.playlist.Shuffle()
-				chrome.storage.sync.set({playlist: storage.playlist}, function() {
-					console.log('Playlist saved ' + storage.playlist)
-				})
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
-	if (request.cmd == 'start') {
-		logj(request)
-		try {
-			chrome.tabs.query({active:true,currentWindow:true}, function (tabs) {
-				chrome.storage.sync.set({playlist: request.ids, running: true}, function() {
-					GetBookmarks(request.ids, urls => {
-						Define(urls, 'current', 0)
-						Define(urls, 'Current', {get: function () {return this[this.current]}})
-						window.playlist = urls
-						window.tab = tabs[0].id
-						chrome.tabs.sendMessage(tabs[0].id, {cmd: 'load.url', url: urls.Current})
-					})
-				})
-			})
-		} catch (e) {}
-		return true
-	}
-})
-
-
-
-
-
-chrome.runtime.onMessageExternal.addListener(function (request, sender, cb) {
 	if (request.cmd == 'stop') {
 		logj(request)
 		try {

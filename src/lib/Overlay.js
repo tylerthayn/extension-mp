@@ -32,6 +32,16 @@ require(['jquery', 'jquery-ui'], ($) => {
 				}
 			})
 
+			if ($('video').length > 0) {
+				$('video').on('ended', () => {
+					if (chrome.runtime && chrome.runtime.sendMessage) {
+						try {
+							chrome.runtime.sendMessage({cmd: 'next'})
+						} catch (e) {console.log(e)}
+					}
+				})
+			}
+
 
 
 			this._update()

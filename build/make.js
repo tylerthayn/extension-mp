@@ -14,6 +14,7 @@ Fs.copyFileSync(Path.resolve('./src/images/player.png'), Path.resolve('./dist/im
 
 try {Fs.mkdirSync(Path.resolve('./dist/scripts'))} catch (e) {}
 Fs.copyFileSync(Path.resolve('./src/lib/web.core.js'), Path.resolve('./dist/scripts/web.core.js'))
+Fs.copyFileSync(Path.resolve('./src/lib/jquery.ui.tree.js'), Path.resolve('./dist/scripts/jquery.ui.tree.js'))
 Fs.copyFileSync(Path.resolve('./src/lib/Overlay.js'), Path.resolve('./dist/scripts/Overlay.js'))
 Fs.copyFileSync(Path.resolve('./temp/content.js'), Path.resolve('./dist/scripts/content.js'))
 Fs.copyFileSync(Path.resolve('./temp/background.js'), Path.resolve('./dist/scripts/background.js'))
@@ -45,9 +46,9 @@ function BuildContentScript () {
 
 function BuildBackgroundScript () {
 	let handlers = Fs.readdirSync(Path.resolve('./src/backgroundScript/Handlers')).map(f=>`./src/backgroundScript/Handlers/${f}`)
-	let externalHandlers = Fs.readdirSync(Path.resolve('./src/backgroundScript/ExternalHandlers')).map(f=>`./src/backgroundScript/ExternalHandlers/${f}`)
+	//let externalHandlers = Fs.readdirSync(Path.resolve('./src/backgroundScript/ExternalHandlers')).map(f=>`./src/backgroundScript/ExternalHandlers/${f}`)
 
-	handlers = handlers.concat(externalHandlers)
+	//handlers = handlers.concat(externalHandlers)
 	MergeFiles('./temp/background.js', './src/backgroundScript/Playlist.js', './src/backgroundScript/background.js', ...handlers)
 
 }
